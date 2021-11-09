@@ -10,4 +10,9 @@ namespace PHYSIC {
 	public:
 		virtual Collider getCollider() = 0;
 	};
+
+	struct Collision {
+		bool hasCollision;
+		IPhysicObject* collisionObj = NULL;
+	};
 }

@@ -1,6 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <string>
+#include <vector>
 #include "Block.h"
 #include "Ball.h"
 #include "Physic.h"
@@ -9,10 +10,17 @@
 int main()
 {
     sf::RenderWindow window(sf::VideoMode(400, 600), "Ping pong");
+
     BLOCK::PlayerBlock block(sf::Vector2f(50, 10), sf::Vector2f(200, 500), 400, 0);
-    PHYSIC::IPhysicObject* physObj = &block;
-    BALL::Ball ball(5, sf::Vector2f(200, 485), 400, 0, 600, 0, physObj, 1);
+    BLOCK::DestoyingBlock destBlock(sf::Vector2f(200, 50), sf::Vector2f(50, 10), 10);
+
+    std::vector<PHYSIC::IPhysicObject*> physObj;
+    physObj.push_back(&block);
+    physObj.push_back(&destBlock);
+
+    BALL::Ball ball(5, sf::Vector2f(200, 485), 400, 0, 600, 0, physObj, 2);
     ball.setDirection(sf::Vector2f(0, -1));
+    ball.setFillColor(sf::Color::Blue);
     
 
     while (window.isOpen())
@@ -35,6 +43,7 @@ int main()
         window.clear();
         window.draw(block);
         window.draw(ball);
+        window.draw(destBlock);
         window.display();
     }
 
