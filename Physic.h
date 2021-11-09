@@ -3,8 +3,7 @@
 namespace PHYSIC {
 
 	struct Collider {
-		sf::Vector2f pos;
-		sf::Vector2f size;
+		sf::FloatRect rect;
 	};
 
 	class IPhysicObject {

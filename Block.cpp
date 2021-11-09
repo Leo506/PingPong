@@ -15,13 +15,15 @@ namespace BLOCK {
 	PlayerBlock::PlayerBlock(Vector2f size, Vector2f pos, float maxX, float minX) {
 		rectangle.setSize(size);
 		rectangle.setPosition(pos);
-		rectangle.setFillColor(Color::White);
+		rectangle.setFillColor(Color(255, 0, 0));
 
 		min_x = minX + size.x / 2;
 		max_x = maxX - size.x / 2;
 
-		collider.pos = pos;
-		collider.size = Vector2f(size.x / 2, size.y / 2);
+		collider.rect.left = pos.x - size.x / 2;
+		collider.rect.top = pos.y - size.y / 2;
+		collider.rect.width = size.x;
+		collider.rect.height = size.y;
 
 		update();
 	}
@@ -30,7 +32,8 @@ namespace BLOCK {
 	void PlayerBlock::move(const Vector2f& dir) {
 		if (validMove(dir))
 			rectangle.setPosition(rectangle.getPosition() + dir);
-		collider.pos = rectangle.getPosition();
+		collider.rect.left = rectangle.getPosition().x - rectangle.getSize().x / 2;
+		collider.rect.top = rectangle.getPosition().y - rectangle.getSize().y / 2;
 		update();
 	}
 
@@ -82,4 +85,6 @@ namespace BLOCK {
 	PHYSIC::Collider PlayerBlock::getCollider() {
 		return collider;
 	}
+
+	
 }

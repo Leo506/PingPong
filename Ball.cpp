@@ -50,6 +50,7 @@ namespace BALL {
 
 
 	bool Ball::hasCollision() {
+
 		// Проверка по x
 		if (!(circle.getPosition().x >= min_x && circle.getPosition().x <= max_x))
 			return true;
@@ -60,17 +61,10 @@ namespace BALL {
 
 		for (int i = 0; i < countOfObjects; i++)
 		{
-			PHYSIC::Collider collider = physObj[i].getCollider();
-			float max_obj_x = collider.pos.x + collider.size.x;
-			float min_obj_x = collider.pos.x - collider.size.x;
-
-			float max_obj_y = collider.pos.y + collider.size.y;
-			float min_obj_y = collider.pos.y - collider.size.y;
-
-			if (circle.getPosition().x >= min_obj_x && circle.getPosition().x <= max_obj_x && circle.getPosition().y >= min_obj_y && circle.getPosition().y <= max_obj_y)
+			if (circle.getGlobalBounds().intersects(physObj[i].getCollider().rect))
 				return true;
 		}
-
+		
 		return false;
 	}
 
@@ -100,6 +94,24 @@ namespace BALL {
 			return Vector2f(0, 1);
 		if (circle.getPosition().y <= min_y)
 			return Vector2f(0, -1);
+
+		for (int i = 0; i < countOfObjects; i++)
+		{
+			PHYSIC::Collider collider = physObj[i].getCollider();
+			
+			// Столкновение сверху
+			if (circle.getPosition().y <= collider.rect.top) {
+				std::cout << "Collision on top physic object!!" << std::endl;
+				return Vector2f(0, 1);
+			}
+
+			// Столкновение снизу
+			if (circle.getPosition().y >= collider.rect.top - collider.rect.height) {
+				std::cout << "Collision on bottom of physic object!!!" << std::endl;
+				return Vector2f(0, -1);
+			}
+		}
+		
 
 		return Vector2f(0, 0);
 	}

@@ -12,7 +12,7 @@ int main()
     BLOCK::PlayerBlock block(sf::Vector2f(50, 10), sf::Vector2f(200, 500), 400, 0);
     PHYSIC::IPhysicObject* physObj = &block;
     BALL::Ball ball(5, sf::Vector2f(200, 485), 400, 0, 600, 0, physObj, 1);
-    ball.setDirection(sf::Vector2f(0.5f, -0.5f));
+    ball.setDirection(sf::Vector2f(0, -1));
     
 
     while (window.isOpen())
