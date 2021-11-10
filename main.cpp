@@ -23,22 +23,24 @@ int main()
     bool nowRed = true;
     for (size_t i = 0; i < BlocksPerLine; i++)
     {
-        BLOCK::DestoyingBlock* destrBlock = new BLOCK::DestoyingBlock(sf::Vector2f(i * blocksWidth + blocksWidth / 2, 10), sf::Vector2f(blocksWidth, blocksHeight), 10);
-        if (nowRed) {
-            (*destrBlock).setFillColor(sf::Color::Red);
-            nowRed = false;
+        for (int j = 0; j < 5; j++) {
+            BLOCK::DestoyingBlock* destrBlock = new BLOCK::DestoyingBlock(sf::Vector2f(i * blocksWidth + blocksWidth / 2, j * 10 + 5), sf::Vector2f(blocksWidth, blocksHeight), 10);
+            if (nowRed) {
+                (*destrBlock).setFillColor(sf::Color::Red);
+                nowRed = false;
+            }
+            else {
+                (*destrBlock).setFillColor(sf::Color::Blue);
+                nowRed = true;
+            }
+            physObj.push_back(destrBlock);
         }
-        else {
-            (*destrBlock).setFillColor(sf::Color::Blue);
-            nowRed = true;
-        }
-        physObj.push_back(destrBlock);
     }
 
     physObj.push_back(&block);
 
     BALL::Ball ball(5, sf::Vector2f(200, 485), 400, 0, 600, 0, &physObj, 2);
-    ball.setDirection(sf::Vector2f(0, -1));
+    ball.setDirection(sf::Vector2f(0.5f, -0.5f));
     ball.setFillColor(sf::Color::Blue);
     
 
@@ -63,15 +65,28 @@ int main()
         window.draw(ball);
         window.draw(block);
         for (auto obj : physObj) {
-            window.draw(*dynamic_cast<sf::Shape*>(obj));
+            if (obj != NULL)
+                window.draw(*dynamic_cast<sf::Shape*>(obj));
         }
         window.display();
+
+        for (int i = 0; i < physObj.size(); i++)
+        {
+            BLOCK::DestoyingBlock* destBlock = dynamic_cast<BLOCK::DestoyingBlock*>(physObj[i]);
+            if (destBlock != NULL) {
+                if (destBlock->getHP() <= 0) {
+                    delete physObj[i];
+                    physObj.erase(physObj.cbegin() + i);
+                }
+            }
+        }
     }
 
     for (int i = 0; i < physObj.size()-1; i++)
     {
         std::cout << "\n\nDeleting physic object # " << i << " " << std::endl;
-        delete physObj[i];
+        if (physObj[i] != NULL)
+            delete physObj[i];
     }
 
     return 0;

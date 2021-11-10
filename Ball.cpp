@@ -27,7 +27,7 @@ namespace BALL {
 		max_y = maxY;
 		min_y = minY;
 
-		speed = 0.1f;
+		speed = 0.15f;
 
 		physObj = obj;
 
@@ -65,15 +65,17 @@ namespace BALL {
 		if (!(m_pos.y >= min_y && m_pos.y <= max_y))
 			col.hasCollision = true;
 
-		for (auto obj : *physObj)
+		for (int i = 0; i < physObj->size(); i++)
 		{
-			if (getGlobalBounds().intersects(obj->getCollider().rect)) {
+			if (getGlobalBounds().intersects((*physObj)[i]->getCollider().rect)) {
 				col.hasCollision = true;
-				col.collisionObj = obj;
+				col.collisionObj = (*physObj)[i];
 
-				BLOCK::DestoyingBlock* destBlock = dynamic_cast<BLOCK::DestoyingBlock*>(obj);
-				if (destBlock != NULL)
+				BLOCK::DestoyingBlock* destBlock = dynamic_cast<BLOCK::DestoyingBlock*>((*physObj)[i]);
+				if (destBlock != NULL) {
 					destBlock->getDamage(10);
+				}
+
 				break;
 			}
 		}
@@ -109,17 +111,28 @@ namespace BALL {
 			return Vector2f(0, -1);
 
 		PHYSIC::Collider collider = collision.collisionObj->getCollider();
+
 			
 		// Столкновение сверху
 		if (m_pos.y <= collider.rect.top) {
 			std::cout << "Collision on top physic object!!" << std::endl;
-			return Vector2f(0, 1);
+			return Vector2f(0.5f, 0.5f);
 		}
 
 		// Столкновение снизу
 		if (m_pos.y >= collider.rect.top - collider.rect.height) {
 			std::cout << "Collision on bottom of physic object!!!" << std::endl;
 			return Vector2f(0, -1);
+		}
+
+		if (m_pos.x >= collider.rect.left) {
+			std::cout << "Collision on left of physic object!!!" << std::endl;
+			return Vector2f(-1, 0);
+		}
+
+		if (m_pos.x <= collider.rect.left + collider.rect.width) {
+			std::cout << "Collision on right of physic object!!!" << std::endl;
+			return Vector2f(1, 0);
 		}
 		
 
