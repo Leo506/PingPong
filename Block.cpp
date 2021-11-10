@@ -1,6 +1,7 @@
 #include "Block.h"
 #include <SFML/Graphics.hpp>
 #include "Physic.h"
+#include <iostream>
 
 namespace BLOCK {
 	using namespace sf;
@@ -88,6 +89,7 @@ namespace BLOCK {
 		return collider;
 	}
 
+
 	
 
 
@@ -107,6 +109,7 @@ namespace BLOCK {
 
 	void DestoyingBlock::getDamage(float value) {
 		m_hp -= value;
+		std::cout << "get damage: " << value << std::endl;
 
 		//if (m_hp <= 0)
 			// TODO уничтожение объекта

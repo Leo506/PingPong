@@ -16,6 +16,8 @@ namespace BLOCK {
 		virtual sf::Vector2f getPoint(std::size_t index) const;
 		virtual PHYSIC::Collider getCollider();
 
+		~PlayerBlock() {};
+
 	private:
 		bool validMove(const sf::Vector2f&);
 		//sf::RectangleShape rectangle;
@@ -33,10 +35,13 @@ namespace BLOCK {
 	public:
 		DestoyingBlock(sf::Vector2f pos, sf::Vector2f size, float hp);
 		void getDamage(float value);
+		float getHP() { return m_hp; }
 
 		virtual std::size_t getPointCount() const;
 		virtual sf::Vector2f getPoint(std::size_t index) const;
 		virtual PHYSIC::Collider getCollider();
+
+		~DestoyingBlock() {};
 
 	private:
 		float m_hp;

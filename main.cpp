@@ -6,19 +6,38 @@
 #include "Ball.h"
 #include "Physic.h"
 
+const float WindowWidth = 400;
+const float WindowHeight = 600;
+const int BlocksPerLine = 10;
 
 int main()
 {
-    sf::RenderWindow window(sf::VideoMode(400, 600), "Ping pong");
+    sf::RenderWindow window(sf::VideoMode(WindowWidth, WindowHeight), "Ping pong");
 
     BLOCK::PlayerBlock block(sf::Vector2f(50, 10), sf::Vector2f(200, 500), 400, 0);
-    BLOCK::DestoyingBlock destBlock(sf::Vector2f(200, 50), sf::Vector2f(50, 10), 10);
 
     std::vector<PHYSIC::IPhysicObject*> physObj;
-    physObj.push_back(&block);
-    physObj.push_back(&destBlock);
+    
+    float blocksWidth = WindowWidth / BlocksPerLine;
+    float blocksHeight = 10;
+    bool nowRed = true;
+    for (size_t i = 0; i < BlocksPerLine; i++)
+    {
+        BLOCK::DestoyingBlock* destrBlock = new BLOCK::DestoyingBlock(sf::Vector2f(i * blocksWidth + blocksWidth / 2, 10), sf::Vector2f(blocksWidth, blocksHeight), 10);
+        if (nowRed) {
+            (*destrBlock).setFillColor(sf::Color::Red);
+            nowRed = false;
+        }
+        else {
+            (*destrBlock).setFillColor(sf::Color::Blue);
+            nowRed = true;
+        }
+        physObj.push_back(destrBlock);
+    }
 
-    BALL::Ball ball(5, sf::Vector2f(200, 485), 400, 0, 600, 0, physObj, 2);
+    physObj.push_back(&block);
+
+    BALL::Ball ball(5, sf::Vector2f(200, 485), 400, 0, 600, 0, &physObj, 2);
     ball.setDirection(sf::Vector2f(0, -1));
     ball.setFillColor(sf::Color::Blue);
     
@@ -41,10 +60,18 @@ int main()
         ball.move();
 
         window.clear();
-        window.draw(block);
         window.draw(ball);
-        window.draw(destBlock);
+        window.draw(block);
+        for (auto obj : physObj) {
+            window.draw(*dynamic_cast<sf::Shape*>(obj));
+        }
         window.display();
+    }
+
+    for (int i = 0; i < physObj.size()-1; i++)
+    {
+        std::cout << "\n\nDeleting physic object # " << i << " " << std::endl;
+        delete physObj[i];
     }
 
     return 0;

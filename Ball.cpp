@@ -2,21 +2,22 @@
 #include "Ball.h"
 #include <iostream>
 #include "Physic.h"
+#include "Block.h"
 
 namespace BALL {
 	using namespace sf;
 
 	/// <summary>
-	/// Создаёт шарик
+	/// РЎРѕР·РґР°С‘С‚ С€Р°СЂРёРє
 	/// </summary>
-	/// <param name="radius">Радиус шарика</param>
-	/// <param name="start_pos">Стартовая позиция шарика</param>
-	/// <param name="maxX">Максимальное значение по х</param>
-	/// <param name="minX">Минимальное значение по х</param>
-	/// <param name="maxY">Максимальное значение по у</param>
-	/// <param name="minY">Минимальное значение по у</param>
-	/// <param name="obj">Физические объекты</param>
-	Ball::Ball(float radius, const Vector2f& start_pos, float maxX, float minX, float maxY, float minY, std::vector<PHYSIC::IPhysicObject*> obj, int n) {
+	/// <param name="radius">Р Р°РґРёСѓСЃ</param>
+	/// <param name="start_pos">РЎС‚Р°СЂС‚РѕРІР°СЏ РїРѕР·РёС†РёСЏ</param>
+	/// <param name="maxX">РњР°РєСЃРёРјР°Р»СЊРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ РїРѕ x</param>
+	/// <param name="minX">РњРёРЅРёРјР°Р»СЊРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ РїРѕ x</param>
+	/// <param name="maxY">РњР°РєСЃРёРјР°Р»СЊРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ РїРѕ y</param>
+	/// <param name="minY">РњРёРЅРёРјР°Р»СЊРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ РїРѕ y</param>
+	/// <param name="obj">Р’РµРєС‚РѕСЂ С„РёР·РёС‡РµСЃРєРёС… РѕР±СЉРµРєС‚РѕРІ</param>
+	Ball::Ball(float radius, const Vector2f& start_pos, float maxX, float minX, float maxY, float minY, std::vector<PHYSIC::IPhysicObject*>* obj, int n) {
 		m_pos = start_pos;
 		m_radius = radius;
 
@@ -55,19 +56,24 @@ namespace BALL {
 		col.hasCollision = false;
 		col.collisionObj = NULL;
 
-		// Проверка по x
+		// РџСЂРѕРІРµСЂРєР° РїРѕ x
+
 		if (!(m_pos.x >= min_x && m_pos.x <= max_x))
 			col.hasCollision = true;
 
-		// Проверка по y
+		// РџСЂРѕРІРµСЂРєР° y
 		if (!(m_pos.y >= min_y && m_pos.y <= max_y))
 			col.hasCollision = true;
 
-		for (auto obj : physObj)
+		for (auto obj : *physObj)
 		{
 			if (getGlobalBounds().intersects(obj->getCollider().rect)) {
 				col.hasCollision = true;
 				col.collisionObj = obj;
+
+				BLOCK::DestoyingBlock* destBlock = dynamic_cast<BLOCK::DestoyingBlock*>(obj);
+				if (destBlock != NULL)
+					destBlock->getDamage(10);
 				break;
 			}
 		}
@@ -90,13 +96,13 @@ namespace BALL {
 
 
 	Vector2f Ball::getNormal(PHYSIC::Collision collision) {
-		// Проверка по x
+		// РџСЂРѕРІРµСЂРєР° x
 		if (m_pos.x >= max_x)
 			return Vector2f(1, 0);
 		if (m_pos.x <= min_x)
 			return Vector2f(-1, 0);
 
-		// Проверка по y
+		// РџСЂРѕРІРµСЂРєР° y
 		if (m_pos.y >= max_y)
 			return Vector2f(0, 1);
 		if (m_pos.y <= min_y)
@@ -104,13 +110,13 @@ namespace BALL {
 
 		PHYSIC::Collider collider = collision.collisionObj->getCollider();
 			
-		// Столкновение сверху
+		// РЎС‚РѕР»РєРЅРѕРІРµРЅРёРµ СЃРІРµСЂС…Сѓ
 		if (m_pos.y <= collider.rect.top) {
 			std::cout << "Collision on top physic object!!" << std::endl;
 			return Vector2f(0, 1);
 		}
 
-		// Столкновение снизу
+		// РЎС‚РѕР»РєРЅРѕРІРµРЅРёРµ СЃРЅРёР·Сѓ
 		if (m_pos.y >= collider.rect.top - collider.rect.height) {
 			std::cout << "Collision on bottom of physic object!!!" << std::endl;
 			return Vector2f(0, -1);

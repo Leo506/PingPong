@@ -9,6 +9,7 @@ namespace PHYSIC {
 	class IPhysicObject {
 	public:
 		virtual Collider getCollider() = 0;
+		virtual ~IPhysicObject() {};
 	};
 
 	struct Collision {
