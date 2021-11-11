@@ -3,6 +3,7 @@
 #include <iostream>
 #include "Physic.h"
 #include "Block.h"
+#include "UI.h"
 
 namespace BALL {
 	using namespace sf;
@@ -17,7 +18,7 @@ namespace BALL {
 	/// <param name="maxY">Максимальное значение по y</param>
 	/// <param name="minY">Минимальное значение по y</param>
 	/// <param name="obj">Вектор физических объектов</param>
-	Ball::Ball(float radius, const Vector2f& start_pos, float maxX, float minX, float maxY, float minY, std::vector<PHYSIC::IPhysicObject*>* obj, int n) {
+	Ball::Ball(float radius, const Vector2f& start_pos, float maxX, float minX, float maxY, float minY, std::vector<PHYSIC::IPhysicObject*>* obj, GAME::GameController* gameController) {
 		m_pos = start_pos;
 		m_radius = radius;
 
@@ -31,7 +32,7 @@ namespace BALL {
 
 		physObj = obj;
 
-		countOfObjects = n;
+		pGameController = gameController;
 
 		update();
 	}
@@ -105,8 +106,10 @@ namespace BALL {
 			return Vector2f(-1, 0);
 
 		// Проверка y
-		if (m_pos.y >= max_y)
+		if (m_pos.y >= max_y) {
+			pGameController->getDamage();
 			return Vector2f(0, 1);
+		}
 		if (m_pos.y <= min_y)
 			return Vector2f(0, -1);
 
@@ -116,7 +119,10 @@ namespace BALL {
 		// Столкновение сверху
 		if (m_pos.y <= collider.rect.top) {
 			std::cout << "Collision on top physic object!!" << std::endl;
-			return Vector2f(0.5f, 0.5f);
+			if (m_pos.x <= collider.rect.left + collider.rect.width / 2)
+				return Vector2f(0.5f, 0.5f);
+			else
+				return Vector2f(-0.5f, 0.5f);
 		}
 
 		// Столкновение снизу
@@ -127,12 +133,12 @@ namespace BALL {
 
 		if (m_pos.x >= collider.rect.left) {
 			std::cout << "Collision on left of physic object!!!" << std::endl;
-			return Vector2f(-1, 0);
+			return Vector2f(1, 0);
 		}
 
 		if (m_pos.x <= collider.rect.left + collider.rect.width) {
 			std::cout << "Collision on right of physic object!!!" << std::endl;
-			return Vector2f(1, 0);
+			return Vector2f(-1, 0);
 		}
 		
 

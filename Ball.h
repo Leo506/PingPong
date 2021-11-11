@@ -2,12 +2,13 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include "Physic.h"
+#include "Game.h"
 
 namespace BALL {
 	using namespace sf;
 	class Ball : public Shape {
 	public:
-		Ball(float radius, const Vector2f& start_pos, float maxX, float minX, float maxY, float minY, std::vector<PHYSIC::IPhysicObject*>* obj, int n);
+		Ball(float radius, const Vector2f& start_pos, float maxX, float minX, float maxY, float minY, std::vector<PHYSIC::IPhysicObject*>* obj, GAME::GameController* gameController);
 		void move();
 		void setDirection(const Vector2f& dir);
 		virtual std::size_t getPointCount() const;
@@ -32,6 +33,6 @@ namespace BALL {
 		float speed;
 
 		std::vector<PHYSIC::IPhysicObject*>* physObj;
-		int countOfObjects;
+		GAME::GameController* pGameController;
 	};
 }
