@@ -152,6 +152,7 @@
     <ClInclude Include="Block.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Physic.h" />
+    <ClInclude Include="Reset.h" />
     <ClInclude Include="Settings.h" />
     <ClInclude Include="UI.h" />
   </ItemGroup>

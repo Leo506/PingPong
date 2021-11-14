@@ -2,25 +2,26 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include "Physic.h"
+#include "Reset.h"
 #include "Game.h"
 
 namespace BALL {
-	using namespace sf;
-	class Ball : public Shape {
+	class Ball : public sf::Shape, public RESET::IResetableObject {
 	public:
-		Ball(float radius, const Vector2f& start_pos, float maxX, float minX, float maxY, float minY, std::vector<PHYSIC::IPhysicObject*>* obj, GAME::GameController* gameController);
+		Ball(float radius, const sf::Vector2f& start_pos, float maxX, float minX, float maxY, float minY, std::vector<PHYSIC::IPhysicObject*>* obj, GAME::GameController* gameController);
 		void move();
-		void setDirection(const Vector2f& dir);
+		void setDirection(const sf::Vector2f& dir);
 		virtual std::size_t getPointCount() const;
-		virtual Vector2f getPoint(std::size_t index) const;
+		virtual sf::Vector2f getPoint(std::size_t index) const;
+		virtual void reset();
 
 	private:
 		PHYSIC::Collision hasCollision();
-		Vector2f rebound(const Vector2f& dir, PHYSIC::Collision);
-		Vector2f getNormal(PHYSIC::Collision);
+		sf::Vector2f rebound(const sf::Vector2f& dir, PHYSIC::Collision);
+		sf::Vector2f getNormal(PHYSIC::Collision);
 
 		float m_radius;
-		Vector2f m_pos;
+		sf::Vector2f m_pos;
 
 		float max_x;
 		float min_x;
@@ -28,7 +29,7 @@ namespace BALL {
 		float max_y;
 		float min_y;
 
-		Vector2f direction;
+		sf::Vector2f direction;
 
 		float speed;
 

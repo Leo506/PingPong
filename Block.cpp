@@ -2,9 +2,9 @@
 #include <SFML/Graphics.hpp>
 #include "Physic.h"
 #include <iostream>
+#include "Settings.h"
 
 namespace BLOCK {
-	using namespace sf;
 
 	/// <summary>
 	/// Инициализирует блок, которым управляет игрок
@@ -13,7 +13,7 @@ namespace BLOCK {
 	/// <param name="pos">Позиция блока</param>
 	/// <param name="maxX">Максимальное значение по х</param>
 	/// <param name="minX">Минимальное значение по х</param>
-	PlayerBlock::PlayerBlock(Vector2f size, Vector2f pos, float maxX, float minX) {
+	PlayerBlock::PlayerBlock(sf::Vector2f size, sf::Vector2f pos, float maxX, float minX) {
 		/*rectangle.setSize(size);
 		rectangle.setPosition(pos);
 		rectangle.setFillColor(Color(255, 0, 0));*/
@@ -32,7 +32,7 @@ namespace BLOCK {
 	}
 
 
-	void PlayerBlock::move(const Vector2f& dir) {
+	void PlayerBlock::move(const sf::Vector2f& dir) {
 		if (validMove(dir))
 			m_pos += dir;
 		collider.rect.left = m_pos.x - m_size.x / 2;
@@ -41,15 +41,15 @@ namespace BLOCK {
 	}
 
 
-	bool PlayerBlock::validMove(const Vector2f& dir) {
-		Vector2f new_pos = m_pos + dir;
+	bool PlayerBlock::validMove(const sf::Vector2f& dir) {
+		sf::Vector2f new_pos = m_pos + dir;
 		return new_pos.x >= min_x && new_pos.x <= max_x;
 	}
 
 
-	Vector2f PlayerBlock::rebound(const sf::Vector2f& dir) {
-		Vector2f normal(0, 1);
-		Vector2f reflect = dir - (normal + normal);
+	sf::Vector2f PlayerBlock::rebound(const sf::Vector2f& dir) {
+		sf::Vector2f normal(0, 1);
+		sf::Vector2f reflect = dir - (normal + normal);
 		return reflect;
 	}
 
@@ -60,7 +60,7 @@ namespace BLOCK {
 
 
 	sf::Vector2f PlayerBlock::getPoint(std::size_t index) const {
-		Vector2f point;
+		sf::Vector2f point;
 
 		switch (index)
 		{
@@ -89,11 +89,16 @@ namespace BLOCK {
 		return collider;
 	}
 
+	void PlayerBlock::reset() {
+		m_pos = sf::Vector2f((WINDOW_WIDTH - OFFSET) / 2, 500);
+		update();
+	}
+
 
 	
 
 
-	DestoyingBlock::DestoyingBlock(Vector2f pos, Vector2f size, float hp) {
+	DestoyingBlock::DestoyingBlock(sf::Vector2f pos, sf::Vector2f size, float hp) {
 		m_pos = pos;
 		m_size = size;
 		m_hp = hp;
@@ -121,8 +126,8 @@ namespace BLOCK {
 	}
 
 
-	Vector2f DestoyingBlock::getPoint(std::size_t  index) const {
-		Vector2f point;
+	sf::Vector2f DestoyingBlock::getPoint(std::size_t  index) const {
+		sf::Vector2f point;
 
 		switch (index)
 		{

@@ -8,6 +8,12 @@
 #include "Settings.h"
 #include "UI.h"
 #include "Game.h"
+#include "Reset.h"
+
+
+void spawnDestrBlocks(std::vector<PHYSIC::IPhysicObject*>&);
+void respawnDestrBlocks(std::vector<PHYSIC::IPhysicObject*>&);
+void checkDestrBlocks(std::vector<PHYSIC::IPhysicObject*>&);
 
 
 int main()
@@ -16,6 +22,9 @@ int main()
 
     // Вектор указателей на все физические объекты
     std::vector<PHYSIC::IPhysicObject*> physObj;
+
+    // Вектор указателей на reset-объекты
+    std::vector<RESET::IResetableObject*> resetObj;
 
     UI::UIController uiController;
 
@@ -29,45 +38,22 @@ int main()
     ball.setDirection(sf::Vector2f(0.5f, -0.5f));
     ball.setFillColor(sf::Color::Blue);
 
+    resetObj.push_back(&block);
+    resetObj.push_back(&ball);
+    
+    spawnDestrBlocks(physObj);
+
+    // Блок игрока тоже физ. объект, поэтому его добавляем в вектор
+    physObj.push_back(&block);
+
+
     sf::Vertex border1[] = {
         sf::Vertex(sf::Vector2f(OFFSET, 0)),
         sf::Vertex(sf::Vector2f(OFFSET, 600))
     };
     
 
-    // Расчёт размера разрушаюющихся блоков
-    float blocksWidth = (WINDOW_WIDTH - OFFSET) / BLOCKS_PER_LINE;
-    bool nowRed = true;
 
-    for (size_t i = 0; i < BLOCKS_PER_LINE; i++)
-    {
-        for (int j = 0; j < 5; j++) {
-
-            // Создаём новый разрушающийся блок (позиция, размер и количество очков здоровья)
-            // Также чередуем их цвета (красный и синий)
-            // Добавляем указатель на новый блок в вектор физ. объектов
-            
-            BLOCK::DestoyingBlock* destrBlock = new BLOCK::DestoyingBlock(sf::Vector2f(i * blocksWidth + blocksWidth / 2 + OFFSET, j * 10 + 5), sf::Vector2f(blocksWidth, BLOCKS_HEIGHT), 10);
-            
-            if (nowRed) {
-                (*destrBlock).setFillColor(sf::Color::Red);
-                nowRed = false;
-            }
-            
-            else {
-                (*destrBlock).setFillColor(sf::Color::Blue);
-                nowRed = true;
-            }
-
-            physObj.push_back(destrBlock);
-        }
-    }
-
-    // Блок игрока тоже физ. объект, поэтому его добавляем в вектор
-    physObj.push_back(&block);
-
-    
-    bool isPlaying = true;
 
     while (window.isOpen())
     {
@@ -80,7 +66,8 @@ int main()
 
 
         window.clear();
-        if (gameController.getHPCount() > 0) {
+
+        if (gameController.getHPCount() > 0 && physObj.size() > 1) {
 
             // Движение влево
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
@@ -93,10 +80,16 @@ int main()
             ball.move();
         }
         else {
-            uiController.gameOver(window);
+            if (gameController.getHPCount() <= 0)
+                uiController.gameOver(window);
+            else
+                uiController.win(window);
 
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
-                gameController.setHPCount();
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
+                gameController.resetGame(resetObj);
+                respawnDestrBlocks(physObj);
+                physObj.push_back(&block);
+            }
         }
 
         
@@ -113,33 +106,79 @@ int main()
 
         window.display();
 
-
-        // Проверка количества очков здоровья у разрушающихся блоков
-        // Если они <= 0, то удаляем блок
-        for (int i = 0; i < physObj.size(); i++)
-        {
-            BLOCK::DestoyingBlock* destBlock = dynamic_cast<BLOCK::DestoyingBlock*>(physObj[i]);
-            if (destBlock != NULL) {
-                if (destBlock->getHP() <= 0) {
-                    delete physObj[i];
-                    physObj.erase(physObj.cbegin() + i);
-                }
-            }
-        }
-
-
+        checkDestrBlocks(physObj);
         
     }
 
 
     // Если игра завершена дострочно (не все блоки разбиты)
     // освобождаем занятую память
-    for (int i = 0; i < physObj.size()-1; i++)
+    for (int i = 0; i < physObj.size(); i++)
     {
         std::cout << "\n\nDeleting physic object # " << i << " " << std::endl;
-        if (physObj[i] != NULL)
+        if (physObj[i] != NULL && dynamic_cast<BLOCK::PlayerBlock*>(physObj[i]) == NULL)
             delete physObj[i];
     }
 
     return 0;
+}
+
+
+void spawnDestrBlocks(std::vector<PHYSIC::IPhysicObject*>& physVector) {
+    // Расчёт размера разрушаюющихся блоков
+    float blocksWidth = (WINDOW_WIDTH - OFFSET) / BLOCKS_PER_LINE;
+    bool nowRed = true;
+
+    for (size_t i = 0; i < BLOCKS_PER_LINE; i++)
+    {
+        for (int j = 0; j < 5; j++) {
+
+            // Создаём новый разрушающийся блок (позиция, размер и количество очков здоровья)
+            // Также чередуем их цвета (красный и синий)
+            // Добавляем указатель на новый блок в вектор физ. объектов
+
+            BLOCK::DestoyingBlock* destrBlock = new BLOCK::DestoyingBlock(sf::Vector2f(i * blocksWidth + blocksWidth / 2 + OFFSET, j * 10 + 5), sf::Vector2f(blocksWidth, BLOCKS_HEIGHT), 10);
+
+            if (nowRed) {
+                (*destrBlock).setFillColor(sf::Color::Red);
+                nowRed = false;
+            }
+
+            else {
+                (*destrBlock).setFillColor(sf::Color::Blue);
+                nowRed = true;
+            }
+
+            physVector.push_back(destrBlock);
+        }
+    }
+}
+
+
+void checkDestrBlocks(std::vector<PHYSIC::IPhysicObject*>& physObj) {
+    // Проверка количества очков здоровья у разрушающихся блоков
+    // Если они <= 0, то удаляем блок
+    for (int i = 0; i < physObj.size(); i++)
+    {
+        BLOCK::DestoyingBlock* destBlock = dynamic_cast<BLOCK::DestoyingBlock*>(physObj[i]);
+        if (destBlock != NULL) {
+            if (destBlock->getHP() <= 0) {
+                delete physObj[i];
+                physObj.erase(physObj.cbegin() + i);
+            }
+        }
+    }
+}
+
+void respawnDestrBlocks(std::vector<PHYSIC::IPhysicObject*>& physObj) {
+    for (size_t i = 0; i < physObj.size(); i++)
+    {
+        if (physObj[i] != NULL && dynamic_cast<BLOCK::PlayerBlock*>(physObj[i]) == NULL) {
+            delete physObj[i];
+        }
+    }
+
+    physObj.clear();
+
+    spawnDestrBlocks(physObj);
 }

@@ -22,6 +22,13 @@ namespace UI {
 		gameOverText.setFillColor(sf::Color::Red);
 		gameOverText.setStyle(sf::Text::Bold);
 		gameOverText.setPosition(WINDOW_WIDTH / 2 - 150, WINDOW_HEIGHT / 2);
+
+		winText.setString("\tYOU WON!!!\nPress space to start again");
+		gameOverText.setFont(font);
+		gameOverText.setCharacterSize(24);
+		gameOverText.setFillColor(sf::Color::Red);
+		gameOverText.setStyle(sf::Text::Bold);
+		gameOverText.setPosition(WINDOW_WIDTH / 2 - 150, WINDOW_HEIGHT / 2);
 	}
 
 	void UIController::drawUI(sf::RenderWindow& window, GAME::GameController& gameController) {
@@ -37,5 +44,9 @@ namespace UI {
 	void UIController::gameOver(sf::RenderWindow& window) {
 
 		window.draw(gameOverText);
+	}
+
+	void UIController::win(sf::RenderWindow& window) {
+		window.draw(winText);
 	}
 }

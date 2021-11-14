@@ -4,10 +4,10 @@
 #include "Physic.h"
 #include "Block.h"
 #include "UI.h"
+#include "Game.h"
 
 namespace BALL {
-	using namespace sf;
-
+	
 	/// <summary>
 	/// Создаёт шарик
 	/// </summary>
@@ -18,7 +18,7 @@ namespace BALL {
 	/// <param name="maxY">Максимальное значение по y</param>
 	/// <param name="minY">Минимальное значение по y</param>
 	/// <param name="obj">Вектор физических объектов</param>
-	Ball::Ball(float radius, const Vector2f& start_pos, float maxX, float minX, float maxY, float minY, std::vector<PHYSIC::IPhysicObject*>* obj, GAME::GameController* gameController) {
+	Ball::Ball(float radius, const sf::Vector2f& start_pos, float maxX, float minX, float maxY, float minY, std::vector<PHYSIC::IPhysicObject*>* obj, GAME::GameController* gameController) {
 		m_pos = start_pos;
 		m_radius = radius;
 
@@ -85,33 +85,33 @@ namespace BALL {
 	}
 
 
-	Vector2f Ball::rebound(const Vector2f& dir, PHYSIC::Collision collision) {
-		Vector2f normal = getNormal(collision);
+	sf::Vector2f Ball::rebound(const sf::Vector2f& dir, PHYSIC::Collision collision) {
+		sf::Vector2f normal = getNormal(collision);
 		std::cout << "Normal: " << normal.x << " " << normal.y << std::endl;
 
-		Vector2f reflect;
-		if (normal != Vector2f(0, 0))
+		sf::Vector2f reflect;
+		if (normal != sf::Vector2f(0, 0))
 			reflect = dir - (normal + normal);
 		else
-			reflect = Vector2f(direction.x, direction.y * -1);
+			reflect = sf::Vector2f(direction.x, direction.y * -1);
 		return reflect;
 	}
 
 
-	Vector2f Ball::getNormal(PHYSIC::Collision collision) {
+	sf::Vector2f Ball::getNormal(PHYSIC::Collision collision) {
 		// Проверка x
 		if (m_pos.x >= max_x)
-			return Vector2f(1, 0);
+			return sf::Vector2f(1, 0);
 		if (m_pos.x <= min_x)
-			return Vector2f(-1, 0);
+			return sf::Vector2f(-1, 0);
 
 		// Проверка y
 		if (m_pos.y >= max_y) {
 			pGameController->getDamage();
-			return Vector2f(0, 1);
+			return sf::Vector2f(0, 1);
 		}
 		if (m_pos.y <= min_y)
-			return Vector2f(0, -1);
+			return sf::Vector2f(0, -1);
 
 		PHYSIC::Collider collider = collision.collisionObj->getCollider();
 
@@ -120,33 +120,33 @@ namespace BALL {
 		if (m_pos.y <= collider.rect.top) {
 			std::cout << "Collision on top physic object!!" << std::endl;
 			if (m_pos.x <= collider.rect.left + collider.rect.width / 2)
-				return Vector2f(0.5f, 0.5f);
+				return sf::Vector2f(0.5f, 0.5f);
 			else
-				return Vector2f(-0.5f, 0.5f);
+				return sf::Vector2f(-0.5f, 0.5f);
 		}
 
 		// Столкновение снизу
 		if (m_pos.y >= collider.rect.top - collider.rect.height) {
 			std::cout << "Collision on bottom of physic object!!!" << std::endl;
-			return Vector2f(0, -1);
+			return sf::Vector2f(0, -1);
 		}
 
 		if (m_pos.x >= collider.rect.left) {
 			std::cout << "Collision on left of physic object!!!" << std::endl;
-			return Vector2f(1, 0);
+			return sf::Vector2f(1, 0);
 		}
 
 		if (m_pos.x <= collider.rect.left + collider.rect.width) {
 			std::cout << "Collision on right of physic object!!!" << std::endl;
-			return Vector2f(-1, 0);
+			return sf::Vector2f(-1, 0);
 		}
 		
 
-		return Vector2f(0, 0);
+		return sf::Vector2f(0, 0);
 	}
 
 
-	void Ball::setDirection(const Vector2f& dir) {
+	void Ball::setDirection(const sf::Vector2f& dir) {
 		direction = dir;
 	}
 
@@ -156,7 +156,7 @@ namespace BALL {
 	}
 
 
-	Vector2f Ball::getPoint(std::size_t index) const {
+	sf::Vector2f Ball::getPoint(std::size_t index) const {
 		static const float pi = 3.141592654f;
 
 		float angle = index * 2 * pi / getPointCount();
@@ -164,5 +164,10 @@ namespace BALL {
 		float y = std::sin(angle) * m_radius + m_pos.y;
 
 		return sf::Vector2f(x, y);
+	}
+
+	void Ball::reset() {
+		m_pos = sf::Vector2f(200, 485);
+		direction = sf::Vector2f(0.5f, -0.5f);
 	}
 }

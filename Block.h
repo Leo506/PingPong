@@ -1,12 +1,12 @@
 #pragma once
-#ifndef BLOCK_H
-#define BLOCK_H
+
 
 #include <SFML/Graphics.hpp>
 #include "Physic.h"
+#include "Reset.h"
 
 namespace BLOCK {
-	class PlayerBlock : public sf::Shape, public PHYSIC::IPhysicObject{
+	class PlayerBlock : public sf::Shape, public PHYSIC::IPhysicObject, public RESET::IResetableObject{
 	public:
 		void move(const sf::Vector2f&);
 		sf::Vector2f rebound(const sf::Vector2f&);
@@ -15,12 +15,12 @@ namespace BLOCK {
 		virtual std::size_t getPointCount() const;
 		virtual sf::Vector2f getPoint(std::size_t index) const;
 		virtual PHYSIC::Collider getCollider();
+		virtual void reset();
 
 		~PlayerBlock() {};
 
 	private:
 		bool validMove(const sf::Vector2f&);
-		//sf::RectangleShape rectangle;
 		float max_x;
 		float min_x;
 
@@ -52,5 +52,4 @@ namespace BLOCK {
 	};
 }
 
-#endif // !BLOCK_H
 
